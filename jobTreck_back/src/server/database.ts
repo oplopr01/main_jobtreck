@@ -39,3 +39,4 @@ export const connect = async (): Promise<Connection | undefined> => {
 export const PrepareDB = () => {
   console.log("Preparing database");
 };
+

@@ -1,4 +1,5 @@
 import { useDispatch } from 'react-redux';
+import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { logOut } from '~/actions';
 
@@ -43,9 +44,9 @@ function DashBoard() {
                       </a>
                     </li>
                     <li className="nav-item">
-                      <a className="nav-link" href="#">
+                      <Link className="nav-link" to="/viewJob">
                         View Job
-                      </a>
+                      </Link>
                     </li>
                   </ul>
                 </li>

@@ -20,6 +20,7 @@ import PrivateRoute from '~/components/PrivateRoute';
 import PublicRoute from '~/components/PublicRoute';
 import SystemAlerts from '~/containers/SystemAlerts';
 import SearchMain from '~/components/SearchMain';
+import ViewJoB from './components/ViewJob'
 
 import Home from '~/routes/Home';
 import NotFound from '~/routes/NotFound';
@@ -101,6 +102,7 @@ function Root() {
               <Route element={<DashBoard />} path="/dashboard" />
 
               <Route element={<NotFound />} path="*" />
+              <Route element={<ViewJoB/>} path='/viewJob' />
             </Routes>
           </Main>
           <Footer />

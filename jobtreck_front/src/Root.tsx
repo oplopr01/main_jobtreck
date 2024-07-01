@@ -6,33 +6,35 @@ import { ThemeProvider } from '@emotion/react';
 import styled from '@emotion/styled';
 import { px } from '@gilbarbara/components';
 import useTreeChanges from 'tree-changes-hook';
-
+ 
 import { name } from '~/config';
-
+ 
 import { useAppSelector } from '~/modules/hooks';
 import theme, { headerHeight } from '~/modules/theme';
-
+ 
 import { alertShow } from '~/actions';
-
+ 
 import Footer from '~/components/Footer';
 import Header from '~/components/Header';
 import PrivateRoute from '~/components/PrivateRoute';
 import PublicRoute from '~/components/PublicRoute';
 import SystemAlerts from '~/containers/SystemAlerts';
 import SearchMain from '~/components/SearchMain';
-import ViewJoB from './components/ViewJob'
-
+import ViewJob from './components/ViewJob';
+import CreateJoB from './components/CreateJob'
+ 
 import Home from '~/routes/Home';
 import NotFound from '~/routes/NotFound';
 import Private from '~/routes/Private';
-
+ 
 import { selectUser } from '~/selectors';
 import { UserState } from '~/types';
 import Register from '~/components/Register';
 import LoginPage from '~/components/LoginPage';
 import DashBoard from './components/DashBoard';
 import { ToastContainer, toast } from 'react-toastify';
-
+import HeaderLogout from './components/HeaderLogout';
+ 
 const AppWrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -41,25 +43,25 @@ const AppWrapper = styled.div`
   position: relative;
   transition: opacity 0.5s;
 `;
-
+ 
 const Main = styled.main<Pick<UserState, 'isAuthenticated'>>`
   min-height: 100vh;
   padding: ${({ isAuthenticated }) => (isAuthenticated ? `${px(headerHeight)} 0 0` : 0)};
 `;
-
+ 
 function Root() {
   const dispatch = useDispatch();
   const user = useAppSelector(selectUser);
   const { changed } = useTreeChanges(user);
-
+ 
   const { isAuthenticated } = user;
-
+ 
   useEffect(() => {
     if (changed('isAuthenticated', true)) {
       dispatch(alertShow('Hello! And welcome!', { type: 'success', icon: 'bell', timeout: 10 }));
     }
   }, [dispatch, changed]);
-
+ 
   return (
     <BrowserRouter>
       <ThemeProvider theme={theme}>
@@ -78,7 +80,8 @@ function Root() {
               rel="stylesheet"
             />
           </Helmet>
-          {isAuthenticated && <Header />}
+          {isAuthenticated ?<HeaderLogout />: <Header />  }
+         
           <Main isAuthenticated={isAuthenticated}>
             <Routes>
               <Route
@@ -100,9 +103,11 @@ function Root() {
               <Route element={<Register />} path="/register" />
               <Route element={<LoginPage />} path="/login" />
               <Route element={<DashBoard />} path="/dashboard" />
-
+ 
               <Route element={<NotFound />} path="*" />
-              <Route element={<ViewJoB/>} path='/viewJob' />
+              <Route element={<ViewJob/>} path='/viewJob' />
+              <Route element={<CreateJoB/>} path='/createJob' />
+ 
             </Routes>
           </Main>
           <Footer />
@@ -112,5 +117,6 @@ function Root() {
     </BrowserRouter>
   );
 }
-
+ 
 export default Root;
+ 

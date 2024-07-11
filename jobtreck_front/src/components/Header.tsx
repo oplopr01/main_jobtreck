@@ -7,12 +7,13 @@ import { appColor, headerHeight } from '~/modules/theme';
 import { logOut } from '~/actions';
 
 import Logo from '~/components/Logo';
+import { Link } from 'react-router-dom';
 
 const HeaderWrapper = styled.header`
   background-color: #113740;
   height: ${headerHeight}px;
   left: 0;
-  position: fixed;
+  position: relative;
   right: 0;
   top: 0;
   z-index: 200;
@@ -36,8 +37,7 @@ const NavbarList = styled.ul`
   padding: 0;
   flex-grow: 1;
   justify-content: center;
-  align-items: center; /* Center align items vertically */
-  text-align: center; /* Center align text */
+  align-items: center;
 
   li {
     margin: 0 15px;
@@ -47,7 +47,7 @@ const NavbarList = styled.ul`
     color: #fff;
     text-decoration: none;
     font-size: 14px;
-    padding: 10px; /* Add padding to increase clickable area */
+    padding: 10px;
 
     ${responsive({ lg: { fontSize: '16px' } })};
 
@@ -71,7 +71,7 @@ const Logout = styled.button`
   }
 `;
 
-export default function Header() {
+export default function Header({ isAuthenticated }) {
   const dispatch = useDispatch();
 
   const handleClickLogout = () => {
@@ -85,7 +85,7 @@ export default function Header() {
         <nav>
           <NavbarList>
             <li>
-              <a href="/">Home</a>
+              <Link to="/Home">Home</Link>
             </li>
             <li>
               <a href="/about">About</a>
@@ -100,17 +100,15 @@ export default function Header() {
               <a href="/Page">Page</a>
             </li>
             <li>
-              <a href="/register">Register</a>
+              <Link to="/register">Register</Link>
             </li>
             <li>
-              <a href="/login">Log In</a>
+             
+                <Link to="/login">Login</Link>
+            
             </li>
           </NavbarList>
         </nav>
-        {/* <Logout data-component-name="Logout" onClick={handleClickLogout}>
-          <Text>logout</Text>
-          <Icon ml="xs" name="sign-out" />
-        </Logout> */}
       </Container>
     </HeaderWrapper>
   );

@@ -12,8 +12,10 @@ import { connection } from "../server/database";
 import { logoutUser } from "../controllers/logout.controller";
 import { getRepository } from "typeorm";
 import Job from "../models/job";
-const router = express.Router();
+import { deleteJob } from  '../controllers/jobController';
 
+import userDetails from '../dummyDelete/userDetails.json'
+const router = express.Router();
 const userSchema = Joi.object().keys({
   email: Joi.string().email().required(),
   username: Joi.string().alphanum().min(4).max(15).optional(),
@@ -138,11 +140,6 @@ router.get("/joblistings", async (_req, res) => {
     res.status(500).json({ error: "Error fetching job listings" });
   }
 });
-
-
-//job creation api
-
-// Assuming jobSchema and router setup are already defined...
  
 router.post('/createjobs', async (req, res) => {
   // Validate request body
@@ -186,6 +183,60 @@ router.post('/createjobs', async (req, res) => {
   }
 });
 
+
+
+router.put('/editjob/:jobId', async (req, res) => {
+  const { jobId } = req.params;
+  const result = jobSchema.validate(req.body);
+
+  if (result.error) {
+    return res.status(422).json({ success: false, msg: `Validation error: ${result.error.details[0].message}` });
+  }
+
+  const { userId, jobTitle, description, location, salary, dateOfPost, lastDate, experience, category } = req.body;
+
+  try {
+    const jobRepository = getRepository(Job);
+    const job = await jobRepository.findOne({ where: { jobId } });
+
+    if (!job) {
+      return res.status(404).json({ success: false, msg: 'Job not found' });
+    }
+    
+    job.userId = userId;
+    job.jobTitle = jobTitle;
+    job.description = description;
+    job.location = location;
+    job.salary = salary;
+    job.dateOfPost = dateOfPost;
+    job.lastDate = lastDate;
+    job.experience = experience;
+    job.category = category;
+
+    await jobRepository.save(job);
+    res.status(200).json({ success: true, msg: 'Job updated successfully', job });
+  } catch (error) {
+    console.error('Error updating job:', error);
+    res.status(500).json({ success: false, msg: 'Internal server error' });
+  }
+});
+
+router.delete('/deletejob/:jobId', deleteJob);
+
+
+router.get('/userdetails', (req, res) => {
+  // Fetch user details by userId
+  req.params
+  res.json(userDetails)
+});
+
+// router.put('/acceptapplication/:userId', (req, res) => {
+//   // Accept the application for the given userId
+// });
+
+// router.put('/rejectapplication/:userId', (req, res) => {
+//   // Reject the application for the given userId
+// });
 router.post("/all", checkToken, (_req, res) => {
   const userRepository = connection!.getRepository(User);
 

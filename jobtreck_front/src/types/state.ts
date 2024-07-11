@@ -37,6 +37,7 @@ export interface GitHubState {
 export interface UserState {
   isAuthenticated: boolean;
   status: ValueOf<Status>;
+  role : string;
 }
 
 export interface RootState {

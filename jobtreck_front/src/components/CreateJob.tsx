@@ -1,6 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
-function CreateJob() {
+interface CreateJobProps {
+  jobData?: any;
+  onSuccess?: () => void; // Added onSuccess prop
+}
+
+const CreateJob: React.FC<CreateJobProps> = ({ jobData, onSuccess }) => {
   const [jobId, setJobId] = useState('');
   const [userId, setUserId] = useState('');
   const [jobTitle, setJobTitle] = useState('');
@@ -11,36 +18,62 @@ function CreateJob() {
   const [lastDate, setLastDate] = useState('');
   const [experience, setExperience] = useState('');
   const [category, setCategory] = useState('');
+  const [isEditMode, setIsEditMode] = useState(false);
 
-  
+  useEffect(() => {
+    if (jobData) {
+      setJobId(jobData.jobId);
+      setUserId(jobData.userId);
+      setJobTitle(jobData.jobTitle);
+      setDescription(jobData.description);
+      setLocation(jobData.location);
+      setSalary(jobData.salary);
+      setDateOfPost(jobData.dateOfPost ? jobData.dateOfPost.split('T')[0] : '');  // Extract date part
+      setLastDate(jobData.lastDate ? jobData.lastDate.split('T')[0] : '');        // Extract date part
+      setExperience(jobData.experience);
+      setCategory(jobData.category);
+      setIsEditMode(true);
+    } else {
+      setIsEditMode(false);
+    }
+  }, [jobData]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     const jobData = {
-      jobId,
-      userId,
-      jobTitle,
-      description,
-      location,
-      salary,
-      dateOfPost,
-      lastDate,
-      experience,
-      category
+      jobId: jobId.toString(),  // Convert jobId to string
+      userId: userId.toString(),
+      jobTitle: jobTitle.toString(),
+      description: description.toString(),
+      location: location.toString(),
+      salary: salary.toString(),
+      dateOfPost: dateOfPost.toString(),
+      lastDate: lastDate.toString(),
+      experience: experience.toString(),
+      category: category.toString()
     };
 
     try {
-      const response = await fetch('http://localhost:5000/api/users/createjobs', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(jobData)
-      });
+      const response = isEditMode
+        ? await fetch(`http://localhost:5000/api/users/editjob/${jobId}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(jobData)
+          })
+        : await fetch('http://localhost:5000/api/users/createjobs', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(jobData)
+          });
 
       if (response.ok) {
         const result = await response.json();
-        console.log('Job created successfully:', result);
+        console.log('Job created/updated successfully:', result);
         // Reset the form fields
         setJobId('');
         setUserId('');
@@ -52,19 +85,28 @@ function CreateJob() {
         setLastDate('');
         setExperience('');
         setCategory('');
+
+        toast.success(`Job ${isEditMode ? 'updated' : 'created'} successfully`);
+
+        if (onSuccess) {
+          onSuccess(); // Call onSuccess to refresh job list
+        }
       } else {
-        console.error('Failed to create job:', response.statusText);
+        const result = await response.json();
+        console.error(`Failed to ${isEditMode ? 'update' : 'create'} job:`, result.msg);
+        toast.error(result.msg);
       }
     } catch (error) {
       console.error('Error:', error);
+      toast.error('An unexpected error occurred');
     }
   };
 
-
   return (
     <div className="container mt-5">
-      <h2>Create Job Listing</h2>
+      <h2>{isEditMode ? 'Edit' : 'Create'} Job Post</h2>
       <form onSubmit={handleSubmit}>
+        {/* Form fields */}
         <div className="mb-3">
           <label htmlFor="jobId" className="form-label">Job ID</label>
           <input
@@ -75,6 +117,7 @@ function CreateJob() {
             value={jobId}
             onChange={(e) => setJobId(e.target.value)}
             required
+            disabled={!!jobData}  // Disable field if in edit mode
           />
         </div>
         <div className="mb-3">
@@ -172,24 +215,22 @@ function CreateJob() {
         </div>
         <div className="mb-3">
           <label htmlFor="category" className="form-label">Category</label>
-          <select
-            className="form-select"
+          <input
+            type="text"
+            className="form-control"
             id="category"
+            placeholder="Enter job category"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
             required
-          >
-            <option value="">Select category</option>
-            <option value="IT">IT</option>
-            <option value="Finance">Finance</option>
-            <option value="Marketing">Marketing</option>
-            <option value="Engineering">Engineering</option>
-          </select>
+          />
         </div>
-        <button type="submit" className="btn btn-primary">Create Job</button>
+        <button type="submit" className="btn btn-primary">
+          {isEditMode ? 'Update Job' : 'Create Job'}
+        </button>
       </form>
     </div>
   );
-}
+};
 
 export default CreateJob;

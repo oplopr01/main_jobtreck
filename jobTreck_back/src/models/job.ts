@@ -16,6 +16,9 @@ export default class Job{
  
   @Column({ type: 'text', nullable: false })
   location!: string;
+
+  @Column({ type: 'text', nullable: false })
+  skills!: string;
  
   @Column({ type: 'integer', nullable: false })
   salary!: number;

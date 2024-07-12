@@ -34,6 +34,7 @@ const jobSchema = Joi.object({
   lastDate: Joi.date().required(),
   experience: Joi.string().required(),
   category: Joi.string().required(),
+  skills: Joi.string().required(),
 });
 
 router.post("/register", (req, res) => {
@@ -148,7 +149,7 @@ router.post('/createjobs', async (req, res) => {
     return res.status(422).json({ success: false, msg: `Validation error: ${result.error.details[0].message}` });
   }
  
-  const { jobId, userId, jobTitle, description, location, salary, dateOfPost, lastDate, experience, category } = req.body;
+  const { jobId, userId, jobTitle, description, location, salary, dateOfPost, lastDate, experience, category, skills } = req.body;
  
   try {
     // Get Job repository
@@ -172,6 +173,7 @@ router.post('/createjobs', async (req, res) => {
       lastDate,
       experience,
       category,
+      skills,
     });
  
     // Save job to database
@@ -193,7 +195,7 @@ router.put('/editjob/:jobId', async (req, res) => {
     return res.status(422).json({ success: false, msg: `Validation error: ${result.error.details[0].message}` });
   }
 
-  const { userId, jobTitle, description, location, salary, dateOfPost, lastDate, experience, category } = req.body;
+  const { userId, jobTitle, description, location, salary, dateOfPost, lastDate, experience, category , skills} = req.body;
 
   try {
     const jobRepository = getRepository(Job);
@@ -212,6 +214,7 @@ router.put('/editjob/:jobId', async (req, res) => {
     job.lastDate = lastDate;
     job.experience = experience;
     job.category = category;
+    job.skills = skills;
 
     await jobRepository.save(job);
     res.status(200).json({ success: true, msg: 'Job updated successfully', job });

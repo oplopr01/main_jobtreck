@@ -18,6 +18,8 @@ const CreateJob: React.FC<CreateJobProps> = ({ jobData, onSuccess }) => {
   const [lastDate, setLastDate] = useState('');
   const [experience, setExperience] = useState('');
   const [category, setCategory] = useState('');
+  const [skills, setSkills] = useState('');
+
   const [isEditMode, setIsEditMode] = useState(false);
 
   useEffect(() => {
@@ -32,6 +34,7 @@ const CreateJob: React.FC<CreateJobProps> = ({ jobData, onSuccess }) => {
       setLastDate(jobData.lastDate ? jobData.lastDate.split('T')[0] : '');        // Extract date part
       setExperience(jobData.experience);
       setCategory(jobData.category);
+      setSkills(jobData.skills)
       setIsEditMode(true);
     } else {
       setIsEditMode(false);
@@ -51,6 +54,7 @@ const CreateJob: React.FC<CreateJobProps> = ({ jobData, onSuccess }) => {
       dateOfPost: dateOfPost.toString(),
       lastDate: lastDate.toString(),
       experience: experience.toString(),
+      skills: skills.toString(),
       category: category.toString()
     };
 
@@ -85,6 +89,7 @@ const CreateJob: React.FC<CreateJobProps> = ({ jobData, onSuccess }) => {
         setLastDate('');
         setExperience('');
         setCategory('');
+        setSkills('')
 
         toast.success(`Job ${isEditMode ? 'updated' : 'created'} successfully`);
 
@@ -164,6 +169,18 @@ const CreateJob: React.FC<CreateJobProps> = ({ jobData, onSuccess }) => {
             placeholder="Enter job location"
             value={location}
             onChange={(e) => setLocation(e.target.value)}
+            required
+          />
+        </div>
+        <div className="mb-3">
+          <label htmlFor="skills" className="form-label">Skills</label>
+          <input
+            type="text"
+            className="form-control"
+            id="skills"
+            placeholder="Enter skills"
+            value={skills}
+            onChange={(e) => setSkills(e.target.value)}
             required
           />
         </div>

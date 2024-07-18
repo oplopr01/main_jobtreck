@@ -5,7 +5,7 @@ import { Container, Icon, responsive, Text } from '@gilbarbara/components';
 import { appColor, headerHeight } from '~/modules/theme';
 
 import { logOut } from '~/actions';
-
+import { Dropdown } from 'react-bootstrap';
 import Logo from '~/components/Logo';
 import { Link } from 'react-router-dom';
 
@@ -71,10 +71,10 @@ const Logout = styled.button`
   }
 `;
 
-export default function Header({ isAuthenticated }) {
+export default function Header({ isAuthenticated, userDetails }) {
   const dispatch = useDispatch();
 
-  const handleClickLogout = () => {
+  const handleLogOut = () => {
     dispatch(logOut());
   };
 
@@ -87,26 +87,38 @@ export default function Header({ isAuthenticated }) {
             <li>
               <Link to="/Home">Home</Link>
             </li>
-            <li>
-              <a href="/about">About</a>
-            </li>
-            <li>
-              <a href="/services">Services</a>
-            </li>
-            <li>
-              <a href="/contact">Contact</a>
-            </li>
-            <li>
-              <a href="/Page">Page</a>
-            </li>
-            <li>
+            {!isAuthenticated ? (<> <li>
               <Link to="/register">Register</Link>
             </li>
-            <li>
-             
+              <li>
+
                 <Link to="/login">Login</Link>
-            
-            </li>
+
+              </li></>)
+              : (
+                <>
+                  <div className="container-fluid d-flex justify-content-between">
+
+                    <Dropdown>
+                      <Dropdown.Toggle variant="secondary" id="dropdown-admin">
+                        {userDetails.username}
+                      </Dropdown.Toggle>
+                      <Dropdown.Menu>
+                        <Dropdown.Item onClick={handleLogOut}>Logout</Dropdown.Item>
+                        {
+                          userDetails.user_role === "user"?<Dropdown.Item onClick={handleLogOut}>Applied jobs</Dropdown.Item>:""
+                        }
+                        <Dropdown.Item as={Link} to="/profile">
+                          Profile
+                        </Dropdown.Item>
+                      </Dropdown.Menu>
+                    </Dropdown>
+                  </div>
+                </>
+              )}
+
+
+
           </NavbarList>
         </nav>
       </Container>

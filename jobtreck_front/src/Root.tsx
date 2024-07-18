@@ -38,7 +38,7 @@ import HomepageOur from './components/HomepageOur';
 import DashboardJobCounts from './components/DashboardJobCounts';
 import Applications from './components/Applications';
 import AdminDashBoard from './components/AdminDashbaord/AdminDashboard';
-
+import JobDetails from '../src/components/JobDetails';
 const AppWrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -58,7 +58,10 @@ function Root() {
   const user = useAppSelector(selectUser);
   const { changed } = useTreeChanges(user);
 
-  const { isAuthenticated, role } = user;
+  const { isAuthenticated, userDetails } = user;
+
+  // console.log(userDetails.user_role, "role");
+  
 
 
   useEffect(() => {
@@ -74,69 +77,56 @@ function Root() {
       <ThemeProvider theme={theme}>
         <ToastContainer />
         <AppWrapper data-component-name="app">
-          <Helmet
-            defaultTitle={name}
-            defer={false}
-            encodeSpecialCharacters
-            htmlAttributes={{ lang: 'pt-br' }}
-            titleAttributes={{ itemprop: 'name', lang: 'pt-br' }}
-            titleTemplate={`%s | ${name}`}
-          >
-            <link
-              href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,700;1,400;1,700&display=swap"
-              rel="stylesheet"
-            />
-          </Helmet>
-          {isAuthenticated ? <HeaderLogout /> : <Header isAuthenticated={isAuthenticated} />}
 
+
+          <Header isAuthenticated={isAuthenticated}  userDetails={userDetails} />
           <Main isAuthenticated={isAuthenticated}>
             <Routes>
               <Route
-               path="/Home"
-               element={
+                path="/Home"
+                element={
                   <PrivateRoute isAuthenticated={isAuthenticated} to="/login">
                     <HomepageOur />
                   </PrivateRoute>
                 }
-               />
-            
+              />
+
               <Route element={<Register />} path="/register" />
               <Route
-              path="/login"
-              element={
-                <PublicRoute isAuthenticated={isAuthenticated} to="/dashboard">
-                  <LoginPage />
-                </PublicRoute>
-              }  />
-
+                path="/login"
+                element={
+                  <PublicRoute isAuthenticated={isAuthenticated}>
+                    <LoginPage />
+                  </PublicRoute>
+                } />
 
               <Route path="/dashboard" element={
                 <PrivateRoute isAuthenticated={isAuthenticated} to="/login">
-                  <DashBoard role={role}/>
+                  <DashBoard userDetails={userDetails} />
                 </PrivateRoute>
               }>
-                
-              <Route
-               element={
-                <PrivateRoute isAuthenticated={isAuthenticated} to="/" >
-                  <ViewJob />
-                </PrivateRoute>
-              } path='/dashboard/viewjob' />
-              <Route
-               element={
-                <PrivateRoute isAuthenticated={isAuthenticated} to="/" >
-                  <Applications />
-                </PrivateRoute>
-              } path='/dashboard/applications' />
-              
-              </Route>
+                <Route
+                  element={
+                    <PrivateRoute isAuthenticated={isAuthenticated} to="/" >
+                      <ViewJob />
+                    </PrivateRoute>
+                  } path='/dashboard/viewjob' />
+                <Route
+                  element={
+                    <PrivateRoute isAuthenticated={isAuthenticated} to="/" >
+                      <Applications />
+                    </PrivateRoute>
+                  } path='/dashboard/applications' />
 
-              <Route element={<NotFound />} path="*" />
+              </Route>
             
-              {/* <Route element={<Applications />} path='/applications' /> */}
+              <Route element={<NotFound />} path="*" />
+
+             
               <Route element={<CreateJoB />} path='/createJob' />
 
               <Route element={<HomepageOur />} path='/' />
+              <Route path="/jobdetails/:jobId" element={<JobDetails />} />
 
             </Routes>
           </Main>

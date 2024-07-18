@@ -11,6 +11,7 @@ import Applications from './Applications';
 
 function DashBoard(props : Props) {
   const [jobListings, setJobListings] = useState([]);
+  // alert(props.userDetails.user_role);
  
   let dispatch = useDispatch();
 
@@ -29,7 +30,7 @@ function DashBoard(props : Props) {
           throw new Error('Network response was not ok');
         }
         const data = await response.json();
-        console.log(data.length);
+      
         
         setJobListings(data);
         // console.log(jobListings);
@@ -43,10 +44,11 @@ function DashBoard(props : Props) {
 
   return (
     <>
-      {props.role === "admin" ?  (
+  
+      {props.userDetails.user_role === "admin" ?  (
         <>
       <h1>DashBoard</h1>
-      <button onClick={handleLogOut}>Log Out</button>
+      <button onClick={handleLogOut}>Log Out, {props.userDetails.username}</button>
       <div className="container-fluid">
         <div className="row">
           <nav className="col-md-2 col-lg-2 d-md-block bg-light sidebar">

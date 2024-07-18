@@ -8,7 +8,7 @@ interface Props {
 }
 
 export default function PrivateRoute(props: Props) {
-  const { children, isAuthenticated, to = '/login' } = props;
+  const { children, isAuthenticated, to } = props;
 
   const { pathname = '' } = useLocation();
 

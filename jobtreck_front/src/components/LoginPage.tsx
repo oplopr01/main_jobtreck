@@ -50,10 +50,10 @@ const LoginPage: React.FC = () => {
         body: JSON.stringify({ email, password }),
       });
 
-      console.log(response);
+     
 
       const data = await response.json();
-      console.log(data, "ggggggggggg");
+      
 
       if (response.ok && data.success) {
         setAlertVariant('success');
@@ -61,22 +61,15 @@ const LoginPage: React.FC = () => {
         setShowAlert(true);
         localStorage.setItem('token', data.token);
         // dispatch(loginSuccess());
-        console.log(data.user.user_role)
-        dispatch(login(data.user.user_role))
+     
+      
+        dispatch(login(data.user))
+        if(data.user.user_role === "admin"){
+          navigate("/dashboard")
+        }else{
+          navigate("/Home")
+        }
 
-        // if (data.user.user_role === 'user') {
-        //   setTimeout(() => {
-        //     navigate(`/private`);
-        //     console.log(loginSuccess());
-            
-        //   }, 1000);
-        // } else {
-        //   setTimeout(() => {
-        //     navigate('/dashboard');
-        
-            
-        //   }, 1000);
-        // }
         setEmail('');
         setPassword('');
         // navigate('/dashboard'); // Navigate to dashboard

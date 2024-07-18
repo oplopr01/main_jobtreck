@@ -65,7 +65,7 @@ router.post("/register", (req, res) => {
           userRepository.save(query).then((u) => {
             return res.json({
               success: true,
-              userID: u.id,
+              userID: u.userId,
               msg: "The user was successfully registered",
             });
           });
@@ -101,7 +101,7 @@ router.post("/login", (req, res) => {
 
         const token = jwt.sign(
           {
-            id: user.id,
+            id: user.userId,
             username: user.username,
             email: user.email,
           },
@@ -111,7 +111,7 @@ router.post("/login", (req, res) => {
           }
         );
 
-        const query = { userId: user.id, token };
+        const query = { userId: user.userId, token };
         activeSessionRepository.save(query);
 
         (user as { password: string | undefined }).password = undefined;
@@ -185,7 +185,19 @@ router.post('/createjobs', async (req, res) => {
   }
 });
 
-
+router.get("/joblistings/:jobId", async (req, res) => {
+  const { jobId } = req.params;
+  try {
+    const job = await getRepository(Job).findOne(jobId);
+    if (!job) {
+      return res.status(404).json({ error: "Job not found" });
+    }
+    res.json(job);
+  } catch (err) {
+    console.error("Error fetching job details:", err);
+    res.status(500).json({ error: "Error fetching job details" });
+  }
+});
 
 router.put('/editjob/:jobId', async (req, res) => {
   const { jobId } = req.params;
@@ -260,9 +272,9 @@ router.post("/edit", checkToken, (req, res) => {
   const { userID, username, email } = req.body;
   const userRepository = connection!.getRepository(User);
 
-  userRepository.find({ id: userID }).then((user) => {
+  userRepository.find({ userId: userID }).then((user) => {
     if (user.length === 1) {
-      const query = { id: user[0].id };
+      const query = { userId: user[0].userId };
       const newvalues = { username, email };
 
       userRepository

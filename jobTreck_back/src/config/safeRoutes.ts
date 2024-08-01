@@ -13,8 +13,7 @@ export const checkToken = (req: Request, res: Response, next: NextFunction) => {
   const token = String(req.headers.authorization || req.body.token);
   const activeSessionRepository = connection!.getRepository(ActiveSession);
   activeSessionRepository.find({ token }).then((session) => {
-    console.log(token);
-    console.log(session);
+    
     if (session.length === 1) {
       return next();
     }

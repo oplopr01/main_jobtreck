@@ -2,14 +2,14 @@
 import { Connection, ConnectionOptions, createConnection } from "typeorm";
 
 // Import your entities (models)
+import AppliedJob from "../models/appliedjob";
 import ActiveSession from "../models/activeSession";
 import User from "../models/user";
 import Role from "../models/role";
 import Job from "../models/job";
-
 // Define MySQL connection options
 const options: ConnectionOptions = {
-  entities: [User, ActiveSession, Role, Job],
+  entities: [User, ActiveSession, Role, Job,AppliedJob],
   logging: true,
   type: "mysql", // Specify the database type
   host: "localhost", // MySQL server host

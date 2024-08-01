@@ -39,6 +39,8 @@ import DashboardJobCounts from './components/DashboardJobCounts';
 import Applications from './components/Applications';
 import AdminDashBoard from './components/AdminDashbaord/AdminDashboard';
 import JobDetails from '../src/components/JobDetails';
+import AppliedJobs from './components/AppliedJobs';
+import Profile from './components/Profile';
 const AppWrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -85,8 +87,16 @@ function Root() {
               <Route
                 path="/Home"
                 element={
-                  <PrivateRoute isAuthenticated={isAuthenticated} to="/login">
+                  <PrivateRoute isAuthenticated={isAuthenticated} to="">
                     <HomepageOur />
+                  </PrivateRoute>
+                }
+              />
+               <Route
+                path="/appliedjobs"
+                element={
+                  <PrivateRoute isAuthenticated={isAuthenticated} to="/">
+                    <AppliedJobs  />
                   </PrivateRoute>
                 }
               />
@@ -126,6 +136,7 @@ function Root() {
               <Route element={<CreateJoB />} path='/createJob' />
 
               <Route element={<HomepageOur />} path='/' />
+              <Route element={<Profile />} path='/profile' />
               <Route path="/jobdetails/:jobId" element={<JobDetails />} />
 
             </Routes>

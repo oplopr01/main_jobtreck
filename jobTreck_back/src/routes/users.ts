@@ -13,8 +13,7 @@ import { logoutUser } from "../controllers/logout.controller";
 import { getRepository } from "typeorm";
 import Job from "../models/job";
 import { deleteJob } from  '../controllers/jobController';
-
-import userDetails from '../dummyDelete/userDetails.json'
+import AppliedJob from "../models/appliedjob"
 const router = express.Router();
 const userSchema = Joi.object().keys({
   email: Joi.string().email().required(),
@@ -35,6 +34,11 @@ const jobSchema = Joi.object({
   experience: Joi.string().required(),
   category: Joi.string().required(),
   skills: Joi.string().required(),
+});
+
+const applySchema = Joi.object({
+  userId: Joi.string().required(),
+  jobId: Joi.string().required(),
 });
 
 router.post("/register", (req, res) => {
@@ -141,7 +145,8 @@ router.get("/joblistings", async (_req, res) => {
     res.status(500).json({ error: "Error fetching job listings" });
   }
 });
- 
+
+
 router.post('/createjobs', async (req, res) => {
   // Validate request body
   const result = jobSchema.validate(req.body);
@@ -239,19 +244,112 @@ router.put('/editjob/:jobId', async (req, res) => {
 router.delete('/deletejob/:jobId', deleteJob);
 
 
-router.get('/userdetails', (req, res) => {
-  // Fetch user details by userId
-  req.params
-  res.json(userDetails)
+// router.get('/userdetails', (req, res) => {
+//   // Fetch user details by userId
+//   req.params
+//   res.json(userDetails)
+// });
+
+router.post('/apply', async (req, res) => {
+  try {
+    // Validate request body
+    const { error } = applySchema.validate(req.body);
+    if (error) {
+      return res.status(400).json({ error: error.details[0].message });
+    }
+
+    const { userId, jobId } = req.body;
+     
+    // Check if user exists
+    const userRepository = getRepository(User);
+    const user = await userRepository.findOne(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Check if job exists
+    const jobRepository = getRepository(Job);
+    const job = await jobRepository.findOne(jobId);
+    if (!job) {
+      return res.status(404).json({ error: 'Job not found' });
+    }
+
+    // Check if the application already exists
+    const appliedJobsRepository = getRepository(AppliedJob);
+    const existingApplication = await appliedJobsRepository.findOne({ where: { userId, jobId } });
+    if (existingApplication) {
+      return res.status(400).json({ error: 'You have already applied for this job' });
+    }
+
+    // Create new application
+    const appliedJob = new AppliedJob();
+    appliedJob.userId = userId;
+    appliedJob.jobId = jobId;
+    appliedJob.user = user;
+    appliedJob.job = job;
+
+    await appliedJobsRepository.save(appliedJob);
+
+    res.status(201).json({ message: 'Application submitted successfully' });
+  } catch (error) {
+    console.error('Error applying for job:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
 });
 
-// router.put('/acceptapplication/:userId', (req, res) => {
-//   // Accept the application for the given userId
-// });
 
-// router.put('/rejectapplication/:userId', (req, res) => {
-//   // Reject the application for the given userId
-// });
+router.get('/appliedjobs', async (req, res) => {
+  const { userId } = req.query;
+
+  if (!userId) {
+    return res.status(400).json({ error: 'User ID is required' });
+  }
+
+  try {
+    console.log(`Fetching applied jobs for user ID: ${userId}`);
+    const appliedJobsRepository = getRepository(AppliedJob);
+    const appliedJobs = await appliedJobsRepository.query(
+      `SELECT j.jobTitle,j.description, j.location, j.salary, j.skills, a.status
+       FROM AppliedJob a
+       LEFT JOIN Job j ON a.jobId = j.jobId
+       WHERE a.userId = ?`, [userId]
+    );
+    console.log(`Applied jobs fetched:`, appliedJobs);
+    res.json(appliedJobs);
+  } catch (error) {
+    console.error('Error fetching applied jobs:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+
+
+
+
+router.post('/check-application', async (req, res) => {
+  const { userId, jobId } = req.body;
+
+  try {
+    // Validate request body
+    const { error } = applySchema.validate({ userId, jobId });
+    if (error) {
+      return res.status(400).json({ error: error.details[0].message });
+    }
+
+    const appliedJobsRepository = getRepository(AppliedJob);
+    const existingApplication = await appliedJobsRepository.findOne({ where: { userId, jobId } });
+
+    if (existingApplication) {
+      return res.json({ applied: true });
+    } else {
+      return res.json({ applied: false });
+    }
+  } catch (error) {
+    console.error('Error checking application status:', error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 router.post("/all", checkToken, (_req, res) => {
   const userRepository = connection!.getRepository(User);
 

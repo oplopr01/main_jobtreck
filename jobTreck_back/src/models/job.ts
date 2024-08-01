@@ -1,5 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
- 
+import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from "typeorm";
+import  AppliedJob  from './appliedjob';
 @Entity()
 export default class Job{
   @PrimaryGeneratedColumn('uuid')
@@ -36,5 +36,8 @@ export default class Job{
  
   @Column({ type: 'text', nullable: false })
   category!: string;
+
+  @OneToMany(() => AppliedJob, appliedJob => appliedJob.job)
+  appliedJobs!: AppliedJob[];
 }
  

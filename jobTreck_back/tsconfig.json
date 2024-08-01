@@ -21,7 +21,8 @@
       "skipLibCheck": true,
       "sourceMap": true,
       "importHelpers": false,
-      "preserveSymlinks": true
+      "preserveSymlinks": true,
+      "emitDecoratorMetadata": true
     },
     "lib": ["esnext"],
     "include": ["src", "tests"],

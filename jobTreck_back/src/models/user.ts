@@ -1,5 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
-
+import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from "typeorm";
+import AppliedJob from "./appliedjob";
 @Entity()
 export default class User {
   @PrimaryGeneratedColumn("uuid")
@@ -19,4 +19,7 @@ export default class User {
 
   @Column({ type: "text" })
   user_role!: string;
+
+  @OneToMany(() => AppliedJob, appliedJob => appliedJob.user)
+  appliedJobs!: AppliedJob[];
 }

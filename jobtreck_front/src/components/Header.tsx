@@ -7,7 +7,7 @@ import { appColor, headerHeight } from '~/modules/theme';
 import { logOut } from '~/actions';
 import { Dropdown } from 'react-bootstrap';
 import Logo from '~/components/Logo';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const HeaderWrapper = styled.header`
   background-color: #113740;
@@ -74,9 +74,13 @@ const Logout = styled.button`
 export default function Header({ isAuthenticated, userDetails }) {
   const dispatch = useDispatch();
 
+  const navigate = useNavigate();
   const handleLogOut = () => {
     dispatch(logOut());
   };
+  const handleAppliedJob=()=>{
+    navigate("/appliedjobs")
+  }
 
   return (
     <HeaderWrapper data-component-name="Header">
@@ -106,7 +110,7 @@ export default function Header({ isAuthenticated, userDetails }) {
                       <Dropdown.Menu>
                         <Dropdown.Item onClick={handleLogOut}>Logout</Dropdown.Item>
                         {
-                          userDetails.user_role === "user"?<Dropdown.Item onClick={handleLogOut}>Applied jobs</Dropdown.Item>:""
+                          userDetails.user_role === "user"?<Dropdown.Item onClick={handleAppliedJob}>Applied jobs</Dropdown.Item>:""
                         }
                         <Dropdown.Item as={Link} to="/profile">
                           Profile
